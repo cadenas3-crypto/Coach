@@ -1,0 +1,1191 @@
+
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="COACH">
+<meta name="theme-color" content="#07080d">
+<title>COACH</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;1,300;1,400&family=Epilogue:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080d; --s1:#0d0e15; --s2:#12131c; --s3:#181924;
+  --b1:#1e1f2e; --b2:#272840;
+  --tx:#f0f0f8; --mu:#5a5b78; --dim:#2e2f48;
+  --ac:#e8654a; --go:#f0b429; --gr:#34d399; --bl:#60a5fa; --re:#f87171;
+  --sl:#a78bfa;
+  --st:env(safe-area-inset-top,0px); --sb:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{background:var(--bg);color:var(--tx);font-family:'Epilogue',sans-serif;min-height:100vh;overscroll-behavior:none;-webkit-font-smoothing:antialiased;}
+
+/* ONBOARDING */
+#ob{position:fixed;inset:0;z-index:100;background:var(–bg);display:flex;flex-direction:column;}
+#ob::before{content:’’;position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 80% 10%,rgba(232,101,74,.12),transparent 60%),radial-gradient(ellipse 50% 40% at 10% 80%,rgba(167,139,250,.08),transparent 60%);pointer-events:none;}
+.ob-slides{flex:1;position:relative;overflow:hidden;}
+.ob-slide{position:absolute;inset:0;padding:calc(var(–st) + 24px) 28px 160px;display:flex;flex-direction:column;justify-content:center;opacity:0;pointer-events:none;transform:translateX(30px);transition:opacity .35s ease,transform .35s ease;}
+.ob-slide.active{opacity:1;pointer-events:auto;transform:translateX(0);}
+.ob-slide.out{opacity:0;transform:translateX(-30px);}
+
+/* Slide text */
+.eyebrow{font-family:‘DM Mono’,monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(–ac);margin-bottom:18px;}
+.hero-h{font-family:‘Fraunces’,serif;font-size:50px;font-weight:300;line-height:1.05;margin-bottom:18px;}
+.hero-h em{color:var(–ac);font-style:italic;}
+.hero-p{font-size:16px;line-height:1.7;color:var(–mu);}
+.hero-p strong{color:var(–tx);font-weight:500;}
+.slide-step{font-family:‘DM Mono’,monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(–ac);margin-bottom:14px;}
+.slide-h{font-family:‘Fraunces’,serif;font-size:34px;font-weight:300;line-height:1.2;margin-bottom:6px;}
+.slide-p{font-size:13px;color:var(–mu);margin-bottom:28px;line-height:1.6;}
+.big-inp{background:transparent;border:none;border-bottom:2px solid var(–b2);padding:10px 0;width:100%;font-family:‘Fraunces’,serif;font-size:34px;font-weight:300;color:var(–tx);outline:none;caret-color:var(–ac);}
+.big-inp::placeholder{color:var(–dim);}
+.big-inp:focus{border-color:var(–ac);}
+
+/* Prob options */
+.probs{display:flex;flex-direction:column;gap:10px;}
+.prob{display:flex;align-items:center;gap:14px;background:var(–s2);border:1px solid var(–b1);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;}
+.prob.sel,.prob:active{background:rgba(232,101,74,.08);border-color:rgba(232,101,74,.4);}
+.prob-ico{font-size:20px;flex-shrink:0;}
+.prob-t{font-size:14px;font-weight:500;}
+.prob-s{font-size:11px;color:var(–mu);margin-top:2px;}
+
+/* Connect buttons */
+.conn-btn{width:100%;padding:15px;border:none;border-radius:14px;font-family:‘Epilogue’,sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;transition:opacity .2s;}
+.conn-btn:active{opacity:.8;}
+.btn-g{background:#fff;color:#1a1a1a;box-shadow:0 2px 20px rgba(0,0,0,.3);}
+.btn-b{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);color:var(–gr);}
+.conn-ok{display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);border-radius:12px;margin-bottom:10px;font-size:13px;color:var(–gr);}
+.skip-lnk{display:block;text-align:center;font-size:12px;color:var(–mu);cursor:pointer;padding:10px;margin-top:4px;}
+
+/* Loading */
+.load-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.load-orb{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(–ac),#c44dff);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:20px;animation:glow 2s infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(232,101,74,.4);}50%{box-shadow:0 0 0 18px rgba(232,101,74,0);}}
+.load-h{font-family:‘Fraunces’,serif;font-size:26px;font-weight:300;margin-bottom:6px;}
+.load-p{font-size:13px;color:var(–mu);line-height:1.6;margin-bottom:24px;}
+.load-steps{display:flex;flex-direction:column;gap:10px;width:100%;max-width:260px;}
+.lstep{display:flex;align-items:center;gap:12px;font-size:13px;color:var(–mu);transition:color .3s;}
+.lstep.done{color:var(–gr);}
+.lstep.go{color:var(–tx);}
+.lsdot{width:20px;height:20px;border-radius:50%;border:1px solid var(–b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all .3s;}
+.lstep.done .lsdot{background:var(–gr);border-color:var(–gr);color:#fff;}
+.lstep.go .lsdot{border-color:var(–ac);animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* WOW insight */
+.wow-num{font-family:‘Fraunces’,serif;font-size:76px;font-weight:600;line-height:1;color:var(–ac);margin-bottom:6px;}
+.wow-lbl{font-size:14px;color:var(–mu);margin-bottom:20px;}
+.wow-txt{font-family:‘Fraunces’,serif;font-size:20px;font-weight:300;line-height:1.6;font-style:italic;margin-bottom:16px;}
+.wow-txt em{color:var(–ac);font-style:normal;font-weight:600;}
+.wow-txt strong{font-style:italic;font-weight:400;}
+.wow-items{display:flex;flex-direction:column;gap:8px;}
+.wow-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(–s2);border:1px solid var(–b1);border-radius:10px;font-size:13px;}
+.wow-item-v{font-family:‘DM Mono’,monospace;font-weight:500;color:var(–ac);}
+
+/* Bottom bar */
+.ob-bot{position:fixed;bottom:0;left:0;right:0;padding:14px 28px calc(var(–sb) + 18px);background:linear-gradient(to top,var(–bg) 60%,transparent);}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-bottom:14px;}
+.ob-dot{width:5px;height:5px;border-radius:50%;background:var(–b2);transition:all .3s;}
+.ob-dot.on{width:18px;border-radius:3px;background:var(–ac);}
+.ob-btn{width:100%;padding:16px;background:var(–ac);border:none;border-radius:16px;color:#fff;font-family:‘Epilogue’,sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 6px 24px rgba(232,101,74,.3);transition:opacity .2s;}
+.ob-btn:active{opacity:.88;}
+
+/* APP */
+#app{display:none;}
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:calc(72px + var(–sb));}
+.safe{height:var(–st);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;}
+.logo{font-family:‘Fraunces’,serif;font-size:22px;font-weight:300;}
+.logo em{color:var(–ac);font-style:italic;}
+.topbar-r{display:flex;align-items:center;gap:8px;}
+.sync-btn{width:30px;height:30px;border-radius:50%;background:var(–s2);border:1px solid var(–b1);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(–mu);}
+.sync-btn.spinning svg{animation:spin .7s linear infinite;}
+.av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(–ac),#c44dff);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;}
+.int-row{display:flex;gap:6px;padding:0 16px 14px;overflow-x:auto;scrollbar-width:none;}
+.int-row::-webkit-scrollbar{display:none;}
+.intchip{display:flex;align-items:center;gap:6px;padding:5px 11px;border-radius:16px;font-size:11px;font-weight:500;flex-shrink:0;border:1px solid;}
+.intchip.on{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.25);color:var(–gr);}
+.intchip.off{background:transparent;border-color:var(–b2);color:var(–mu);}
+.idot{width:5px;height:5px;border-radius:50%;}
+.intchip.on .idot{background:var(–gr);}
+.intchip.off .idot{background:var(–mu);}
+
+/* Pages */
+.page{display:none;}
+.page.active{display:block;animation:fadein .2s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(3px);}to{opacity:1;transform:translateY(0);}}
+
+/* Narrative */
+.narr{margin:0 16px 18px;padding:18px;border-radius:20px;background:var(–s1);border:1px solid var(–b1);position:relative;overflow:hidden;}
+.narr::after{content:’’;position:absolute;top:0;right:0;width:180px;height:180px;background:radial-gradient(circle at 100% 0%,rgba(232,101,74,.07),transparent 60%);pointer-events:none;}
+.narr-date{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(–mu);margin-bottom:12px;}
+.narr-txt{font-family:‘Fraunces’,serif;font-size:19px;font-weight:300;line-height:1.6;margin-bottom:14px;}
+.narr-txt em{color:var(–ac);font-style:normal;font-weight:400;}
+.narr-txt strong{font-style:italic;}
+.narr-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.narr-btn{padding:7px 13px;border-radius:18px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid;transition:opacity .15s;}
+.narr-btn:active{opacity:.7;}
+.narr-btn-p{background:rgba(232,101,74,.1);border-color:rgba(232,101,74,.3);color:var(–ac);}
+.narr-btn-s{background:transparent;border-color:var(–b2);color:var(–mu);}
+
+/* Rings */
+.rings-wrap{display:flex;flex-direction:column;align-items:center;padding:4px 16px 18px;}
+.rings-svg{position:relative;width:158px;height:158px;margin-bottom:12px;}
+.rings-svg svg{position:absolute;inset:0;}
+.rings-ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rings-n{font-family:‘Fraunces’,serif;font-size:38px;font-weight:300;line-height:1;}
+.rings-l{font-size:10px;color:var(–mu);margin-top:1px;}
+.rings-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%;}
+.rc{display:flex;align-items:center;gap:8px;background:var(–s1);border:1px solid var(–b1);border-radius:12px;padding:9px 11px;}
+.rdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.rl{font-size:10px;color:var(–mu);}
+.rv{font-size:14px;font-weight:600;}
+
+/* Section */
+.sec{padding:0 16px 18px;}
+.slbl{font-family:‘DM Mono’,monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(–mu);margin-bottom:10px;padding:0 2px;display:flex;align-items:center;justify-content:space-between;}
+.sact{color:var(–ac);cursor:pointer;font-size:9px;}
+
+/* Alert */
+.alrt{display:flex;align-items:flex-start;gap:11px;background:var(–s1);border:1px solid var(–b1);border-radius:14px;padding:13px;margin-bottom:8px;}
+.alrt.warn{background:rgba(240,180,41,.04);border-color:rgba(240,180,41,.2);}
+.alrt.good{background:rgba(52,211,153,.04);border-color:rgba(52,211,153,.2);}
+.alrt.bad{background:rgba(248,113,113,.04);border-color:rgba(248,113,113,.2);}
+.alrt.tip{background:rgba(232,101,74,.05);border-color:rgba(232,101,74,.2);}
+.alrt-ico{font-size:16px;flex-shrink:0;margin-top:1px;}
+.alrt-t{font-size:13px;font-weight:600;margin-bottom:2px;}
+.alrt-p{font-size:12px;color:var(–mu);line-height:1.55;}
+
+/* Event */
+.evrow{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;background:var(–s1);border:1px solid var(–b1);border-radius:13px;margin-bottom:7px;}
+.evtime{flex-shrink:0;min-width:44px;text-align:center;}
+.evt{font-family:‘DM Mono’,monospace;font-size:12px;font-weight:500;color:var(–bl);}
+.evd{font-size:9px;color:var(–mu);margin-top:2px;}
+.evdiv{width:1px;background:var(–b1);align-self:stretch;flex-shrink:0;}
+.evtit{font-size:13px;font-weight:600;margin-bottom:3px;}
+.evmeta{font-size:11px;color:var(–mu);}
+
+/* Transaction */
+.txrow{display:flex;align-items:center;gap:11px;padding:10px 13px;background:var(–s1);border:1px solid var(–b1);border-radius:11px;margin-bottom:6px;}
+.txico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;background:var(–s2);}
+.txname{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.txcat{font-size:10px;color:var(–mu);margin-top:2px;}
+.txamt{margin-left:auto;font-family:‘DM Mono’,monospace;font-size:13px;font-weight:500;flex-shrink:0;}
+.neg{color:var(–re);}
+.pos{color:var(–gr);}
+
+/* Correlation */
+.corr{background:var(–s1);border:1px solid var(–b1);border-radius:16px;padding:15px;margin-bottom:10px;}
+.corr-h{display:flex;align-items:center;gap:8px;margin-bottom:9px;}
+.corr-e{font-size:18px;}
+.corr-t{font-size:13px;font-weight:600;}
+.corr-b{font-family:‘DM Mono’,monospace;font-size:9px;padding:2px 7px;border-radius:4px;background:rgba(232,101,74,.1);color:var(–ac);margin-left:auto;}
+.corr-p{font-family:‘Fraunces’,serif;font-size:15px;font-weight:300;line-height:1.6;font-style:italic;margin-bottom:10px;}
+.corr-p em{color:var(–ac);font-style:normal;font-weight:400;}
+.corr-data{display:flex;gap:7px;}
+.cdi{flex:1;background:var(–s2);border-radius:9px;padding:9px;text-align:center;}
+.cdv{font-family:‘Fraunces’,serif;font-size:18px;}
+.cdl{font-size:10px;color:var(–mu);margin-top:2px;}
+
+/* Focus */
+.foc{background:var(–s1);border:1px solid var(–b1);border-radius:13px;padding:13px;margin-bottom:7px;display:flex;gap:11px;align-items:flex-start;}
+.fn{font-family:‘Fraunces’,serif;font-size:26px;color:var(–dim);line-height:1;flex-shrink:0;}
+.ft{font-size:13px;font-weight:600;margin-bottom:3px;}
+.fw{font-size:11px;color:var(–mu);line-height:1.5;}
+.fchk{margin-left:auto;flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1.5px solid var(–b2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:transparent;font-size:11px;transition:all .2s;}
+.fchk.done{background:var(–ac);border-color:var(–ac);color:#fff;}
+
+/* Streak */
+.streak{display:flex;gap:5px;justify-content:center;margin-bottom:8px;}
+.sday{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.scir{width:30px;height:30px;border-radius:50%;border:1.5px solid var(–b2);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(–mu);transition:all .3s;}
+.scir.done{background:var(–ac);border-color:var(–ac);color:#fff;font-size:12px;}
+.scir.today{border-color:var(–ac);color:var(–ac);}
+.sdlbl{font-size:9px;color:var(–mu);}
+
+/* Chat */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 72px - var(–sb) - var(–st));}
+.chat-msgs{flex:1;overflow-y:auto;padding:13px 16px 8px;display:flex;flex-direction:column;gap:9px;}
+.chat-msgs::-webkit-scrollbar{display:none;}
+.cmsg{display:flex;gap:7px;align-items:flex-end;animation:fadein .2s ease;}
+.cmsg.u{flex-direction:row-reverse;}
+.cbub{max-width:80%;padding:11px 13px;border-radius:17px;font-size:14px;line-height:1.5;}
+.cmsg.c .cbub{background:var(–s2);border:1px solid var(–b1);border-bottom-left-radius:4px;}
+.cmsg.u .cbub{background:var(–ac);color:#fff;border-bottom-right-radius:4px;}
+.cav{width:26px;height:26px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;}
+.cmsg.c .cav{background:linear-gradient(135deg,var(–ac),#c44dff);}
+.cmsg.u .cav{background:linear-gradient(135deg,var(–sl),var(–bl));}
+.typ{display:flex;gap:4px;padding:2px 0;}
+.td{width:5px;height:5px;border-radius:50%;background:var(–mu);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.chat-sugg{display:flex;gap:7px;padding:0 16px 7px;overflow-x:auto;scrollbar-width:none;}
+.chat-sugg::-webkit-scrollbar{display:none;}
+.sg{flex-shrink:0;padding:6px 12px;background:var(–s2);border:1px solid var(–b1);border-radius:13px;font-size:12px;color:var(–mu);cursor:pointer;white-space:nowrap;}
+.sg:active{border-color:var(–ac);color:var(–ac);}
+.chat-bar{padding:9px 15px;border-top:1px solid var(–b1);display:flex;gap:8px;align-items:flex-end;background:rgba(7,8,13,.93);backdrop-filter:blur(18px);}
+.cinp{flex:1;background:var(–s2);border:1px solid var(–b1);border-radius:17px;padding:9px 13px;color:var(–tx);font-family:‘Epilogue’,sans-serif;font-size:14px;outline:none;resize:none;max-height:80px;min-height:36px;line-height:1.4;}
+.cinp:focus{border-color:var(–ac);}
+.cinp::placeholder{color:var(–mu);}
+.csend{width:36px;height:36px;border-radius:50%;background:var(–ac);border:none;display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;flex-shrink:0;}
+
+/* Log */
+.logwrap{padding:0 16px 20px;}
+.lcard{background:var(–s1);border:1px solid var(–b1);border-radius:16px;overflow:hidden;margin-bottom:11px;}
+.lchd{padding:12px 15px;border-bottom:1px solid var(–b1);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.lcbd{padding:14px 15px;}
+.flbl{font-size:10px;color:var(–mu);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:5px;}
+.fmb{margin-bottom:13px;}
+.svals{display:flex;justify-content:space-between;font-size:10px;color:var(–mu);margin-bottom:5px;}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(–b2);outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(–ac);cursor:pointer;box-shadow:0 0 0 3px rgba(232,101,74,.2);}
+.togrow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;}
+.togrow+.togrow{border-top:1px solid rgba(30,31,46,.7);}
+.toglbl{font-size:13px;}
+.tog{position:relative;width:40px;height:22px;background:var(–b2);border-radius:11px;cursor:pointer;transition:background .2s;flex-shrink:0;}
+.tog.on{background:var(–ac);}
+.tog::after{content:’’;position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;}
+.tog.on::after{transform:translateX(18px);}
+.cats{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
+.cat{padding:5px 10px;border-radius:14px;border:1px solid var(–b2);font-size:11px;color:var(–mu);cursor:pointer;transition:all .15s;}
+.cat.on{border-color:var(–gr);color:var(–gr);}
+.ifield{background:var(–s2);border:1px solid var(–b2);border-radius:10px;padding:10px 12px;color:var(–tx);font-family:‘Epilogue’,sans-serif;font-size:14px;outline:none;width:100%;}
+.ifield:focus{border-color:var(–ac);}
+.ifield::placeholder{color:var(–mu);}
+.savebtn{width:100%;padding:14px;background:var(–ac);border:none;border-radius:14px;color:#fff;font-family:‘Epilogue’,sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;box-shadow:0 5px 20px rgba(232,101,74,.25);}
+.savebtn:active{opacity:.88;}
+
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:rgba(7,8,13,.94);backdrop-filter:blur(22px);border-top:1px solid var(–b1);padding:7px 0 calc(7px + var(–sb));display:flex;z-index:50;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 4px;border:none;background:transparent;color:var(–mu);font-size:10px;font-family:‘Epilogue’,sans-serif;cursor:pointer;transition:color .15s;}
+.nb svg{width:21px;height:21px;}
+.nb.active{color:var(–ac);}
+
+/* Utils */
+.empty{color:var(–mu);font-size:13px;padding:16px 4px;text-align:center;}
+</style>
+
+</head>
+<body>
+
+<!-- ═══ ONBOARDING ═══ -->
+
+<div id="ob">
+  <div class="ob-slides">
+
+```
+<div class="ob-slide active" id="sl0">
+  <div class="eyebrow">Tu segundo cerebro</div>
+  <div class="hero-h">Conoce tu vida<br>de <em>verdad.</em></div>
+  <div class="hero-p">Conecta tu banco y tu calendario.<br><strong>En 60 segundos</strong> sabrás cosas de ti mismo que llevas años sin ver.</div>
+</div>
+
+<div class="ob-slide" id="sl1">
+  <div class="slide-step">Paso 1 de 3</div>
+  <div class="slide-h">¿Cómo te llamo?</div>
+  <div class="slide-p">Solo tu nombre. Sin email, sin registro.</div>
+  <input class="big-inp" type="text" id="nameInp" placeholder="Tu nombre" autocomplete="off">
+</div>
+
+<div class="ob-slide" id="sl2">
+  <div class="slide-step">Paso 2 de 3</div>
+  <div class="slide-h">¿Qué te preocupa?</div>
+  <div class="slide-p">Empezaré por ahí.</div>
+  <div class="probs">
+    <div class="prob" onclick="selProb(this,'energy')"><div class="prob-ico">⚡</div><div><div class="prob-t">Me falta energía durante el día</div><div class="prob-s">Cansancio, falta de concentración</div></div></div>
+    <div class="prob" onclick="selProb(this,'money')"><div class="prob-ico">💸</div><div><div class="prob-t">Gasto más de lo que debería</div><div class="prob-s">Sin saber exactamente dónde va</div></div></div>
+    <div class="prob" onclick="selProb(this,'focus')"><div class="prob-ico">🎯</div><div><div class="prob-t">No soy productivo</div><div class="prob-s">Me cuesta enfocarme y rendir</div></div></div>
+    <div class="prob" onclick="selProb(this,'habits')"><div class="prob-ico">🔄</div><div><div class="prob-t">No mantengo mis hábitos</div><div class="prob-s">Empiezo bien pero no lo sostengo</div></div></div>
+  </div>
+</div>
+
+<div class="ob-slide" id="sl3">
+  <div class="slide-step">Paso 3 de 3</div>
+  <div class="slide-h">Conecta tus datos.</div>
+  <div class="slide-p" style="margin-bottom:22px">Sin esto no puedo darte insights reales. Solo lectura — nunca toco tu dinero.</div>
+  <div id="gcalRow"><button class="conn-btn btn-g" onclick="connectGoogle()"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Conectar Google Calendar</button></div>
+  <div class="conn-ok" id="gcalOk" style="display:none">✓ Google Calendar conectado <span id="gcalN" style="margin-left:auto;font-size:11px;color:var(--mu)"></span></div>
+  <div id="bankRow"><button class="conn-btn btn-b" onclick="connectBank()">🏦 Conectar mi banco</button></div>
+  <div class="conn-ok" id="bankOk" style="display:none">✓ Banco conectado <span id="bankN" style="margin-left:auto;font-size:11px;color:var(--mu)"></span></div>
+  <span class="skip-lnk" id="skipLnk" onclick="skipAll()">Saltar por ahora — conectar más tarde</span>
+</div>
+
+<div class="ob-slide" id="sl4">
+  <div class="load-wrap">
+    <div class="load-orb">🧠</div>
+    <div class="load-h">Analizando tu vida...</div>
+    <div class="load-p">Dame unos segundos.<br>Estoy buscando patrones en tus datos.</div>
+    <div class="load-steps">
+      <div class="lstep" id="ls0"><div class="lsdot">·</div>Leyendo transacciones</div>
+      <div class="lstep" id="ls1"><div class="lsdot">·</div>Analizando gastos por categoría</div>
+      <div class="lstep" id="ls2"><div class="lsdot">·</div>Revisando tu calendario</div>
+      <div class="lstep" id="ls3"><div class="lsdot">·</div>Detectando patrones ocultos</div>
+      <div class="lstep" id="ls4"><div class="lsdot">·</div>Preparando tu primer insight</div>
+    </div>
+  </div>
+</div>
+
+<div class="ob-slide" id="sl5">
+  <div class="wow-num" id="wowN">—</div>
+  <div class="wow-lbl" id="wowL">—</div>
+  <div class="wow-txt" id="wowT">—</div>
+  <div class="wow-items" id="wowI"></div>
+</div>
+```
+
+  </div>
+
+  <div class="ob-bot">
+    <div class="ob-dots" id="obDots">
+      <div class="ob-dot on"></div>
+      <div class="ob-dot"></div>
+      <div class="ob-dot"></div>
+      <div class="ob-dot"></div>
+    </div>
+    <button class="ob-btn" id="obBtn" onclick="handleBtn()">Empezar →</button>
+  </div>
+</div>
+
+<!-- ═══ MAIN APP ═══ -->
+
+<div id="app">
+<div class="wrap">
+  <div class="safe"></div>
+  <div class="topbar">
+    <div class="logo">C<em>oach</em></div>
+    <div class="topbar-r">
+      <div class="sync-btn" id="syncBtn" onclick="syncAll()">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      </div>
+      <div class="av" id="userAv">?</div>
+    </div>
+  </div>
+  <div class="int-row" id="intRow"></div>
+
+  <!-- HOME -->
+
+  <div class="page active" id="pg-home">
+    <div class="narr">
+      <div class="narr-date" id="narrDate"></div>
+      <div class="narr-txt" id="narrTxt">Cargando...</div>
+      <div class="narr-btns">
+        <div class="narr-btn narr-btn-p" onclick="goPage('coach')">Hablar con tu coach →</div>
+        <div class="narr-btn narr-btn-s" onclick="goPage('log')">Registrar día</div>
+      </div>
+    </div>
+    <div class="rings-wrap">
+      <div class="rings-svg">
+        <svg viewBox="0 0 158 158">
+          <circle cx="79" cy="79" r="69" fill="none" stroke="#1e1f2e" stroke-width="9"/>
+          <circle cx="79" cy="79" r="69" fill="none" stroke="#a78bfa" stroke-width="9" stroke-linecap="round" stroke-dasharray="434" id="rS" stroke-dashoffset="434" transform="rotate(-90 79 79)" style="transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)"/>
+          <circle cx="79" cy="79" r="55" fill="none" stroke="#1e1f2e" stroke-width="9"/>
+          <circle cx="79" cy="79" r="55" fill="none" stroke="#34d399" stroke-width="9" stroke-linecap="round" stroke-dasharray="346" id="rM" stroke-dashoffset="346" transform="rotate(-90 79 79)" style="transition:stroke-dashoffset 1.1s .1s cubic-bezier(.4,0,.2,1)"/>
+          <circle cx="79" cy="79" r="41" fill="none" stroke="#1e1f2e" stroke-width="9"/>
+          <circle cx="79" cy="79" r="41" fill="none" stroke="#60a5fa" stroke-width="9" stroke-linecap="round" stroke-dasharray="258" id="rT" stroke-dashoffset="258" transform="rotate(-90 79 79)" style="transition:stroke-dashoffset 1.1s .2s cubic-bezier(.4,0,.2,1)"/>
+          <circle cx="79" cy="79" r="27" fill="none" stroke="#1e1f2e" stroke-width="9"/>
+          <circle cx="79" cy="79" r="27" fill="none" stroke="#f0b429" stroke-width="9" stroke-linecap="round" stroke-dasharray="170" id="rH" stroke-dashoffset="170" transform="rotate(-90 79 79)" style="transition:stroke-dashoffset 1.1s .3s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="rings-ctr"><div class="rings-n" id="gsc">—</div><div class="rings-l">hoy</div></div>
+      </div>
+      <div class="rings-grid">
+        <div class="rc"><div class="rdot" style="background:var(--sl)"></div><div><div class="rl">Sueño</div><div class="rv" id="rsSl" style="color:var(--sl)">—</div></div></div>
+        <div class="rc"><div class="rdot" style="background:var(--gr)"></div><div><div class="rl">Finanzas</div><div class="rv" id="rsMo" style="color:var(--gr)">—</div></div></div>
+        <div class="rc"><div class="rdot" style="background:var(--bl)"></div><div><div class="rl">Tiempo</div><div class="rv" id="rsTi" style="color:var(--bl)">—</div></div></div>
+        <div class="rc"><div class="rdot" style="background:var(--go)"></div><div><div class="rl">Hábitos</div><div class="rv" id="rsHa" style="color:var(--go)">—</div></div></div>
+      </div>
+    </div>
+    <div class="sec"><div class="slbl">Lo que necesitas saber hoy</div><div id="alertsDiv"></div></div>
+    <div class="sec" id="evSec"><div class="slbl">Agenda <span class="sact" onclick="goPage('insights')">ver todo →</span></div><div id="evDiv"></div></div>
+    <div class="sec" id="txSec"><div class="slbl">Últimos gastos <span class="sact" onclick="goPage('insights')">ver todo →</span></div><div id="txDiv"></div></div>
+    <div class="sec"><div class="slbl">Foco de la semana</div><div id="focDiv"></div></div>
+    <div class="sec"><div class="slbl">Racha</div><div class="streak" id="strkDiv"></div></div>
+  </div>
+
+  <!-- INSIGHTS -->
+
+  <div class="page" id="pg-insights">
+    <div class="sec" style="padding-top:16px"><div class="slbl">Correlaciones reales</div><div id="corrDiv"></div></div>
+    <div class="sec"><div class="slbl">Todos los eventos</div><div id="allEvDiv"></div></div>
+    <div class="sec"><div class="slbl">Todos los gastos</div><div id="allTxDiv"></div></div>
+  </div>
+
+  <!-- COACH -->
+
+  <div class="page" id="pg-coach">
+    <div class="chat-wrap">
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-sugg" id="chatSugg"></div>
+      <div class="chat-bar">
+        <textarea class="cinp" id="chatInp" placeholder="Pregúntame lo que quieras..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}"></textarea>
+        <button class="csend" onclick="sendChat()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="14" height="14"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOG -->
+
+  <div class="page" id="pg-log">
+    <div class="logwrap" style="padding-top:16px">
+      <div id="bankAuto" style="display:none;margin-bottom:11px">
+        <div class="alrt good"><div class="alrt-ico">🏦</div><div><div class="alrt-t">Gastos de hoy importados</div><div class="alrt-p" id="bankAutoTxt"></div></div></div>
+      </div>
+      <div class="lcard">
+        <div class="lchd"><span>😴</span> Sueño &amp; Energía</div>
+        <div class="lcbd">
+          <div class="fmb"><label class="flbl">Horas dormidas</label><div class="svals"><span>3h</span><span id="lsv">7h</span><span>12h</span></div><input type="range" min="3" max="12" value="7" step="0.5" oninput="document.getElementById('lsv').textContent=this.value+'h';ld.sleep=+this.value"></div>
+          <div class="fmb"><label class="flbl">Energía al despertar (1-10)</label><div class="svals"><span>😴</span><span id="lev">6</span><span>🚀</span></div><input type="range" min="1" max="10" value="6" oninput="document.getElementById('lev').textContent=this.value;ld.energy=+this.value"></div>
+          <div class="togrow"><span class="toglbl">¿Ejercicio hoy?</span><div class="tog" id="lEx" onclick="this.classList.toggle('on');ld.exercise=this.classList.contains('on')"></div></div>
+        </div>
+      </div>
+      <div class="lcard">
+        <div class="lchd"><span>💶</span> Gastos del día</div>
+        <div class="lcbd">
+          <div class="fmb"><label class="flbl">Total gastado hoy (€)</label><input class="ifield" type="number" placeholder="0" min="0" id="lSpend" oninput="ld.spend=+this.value||0"></div>
+          <div class="fmb"><label class="flbl">Categoría</label><div class="cats"><div class="cat" onclick="selCat(this,'Comida')">🍔 Comida</div><div class="cat" onclick="selCat(this,'Ocio')">🎮 Ocio</div><div class="cat" onclick="selCat(this,'Compras')">🛍️ Compras</div><div class="cat" onclick="selCat(this,'Transporte')">🚗 Transporte</div><div class="cat" onclick="selCat(this,'Salud')">💊 Salud</div><div class="cat" onclick="selCat(this,'Otros')">📦 Otros</div></div></div>
+        </div>
+      </div>
+      <div class="lcard">
+        <div class="lchd"><span>⏱️</span> Productividad</div>
+        <div class="lcbd">
+          <div class="fmb"><label class="flbl">¿Cómo ha ido el día? (1-10)</label><div class="svals"><span>😞</span><span id="lpv">6</span><span>🔥</span></div><input type="range" min="1" max="10" value="6" oninput="document.getElementById('lpv').textContent=this.value;ld.productivity=+this.value"></div>
+          <div><label class="flbl">Horas de trabajo enfocado</label><div class="svals"><span>0h</span><span id="lfv">4h</span><span>10h</span></div><input type="range" min="0" max="10" value="4" step="0.5" oninput="document.getElementById('lfv').textContent=this.value+'h';ld.focusHours=+this.value"></div>
+        </div>
+      </div>
+      <div class="lcard">
+        <div class="lchd"><span>🔁</span> Hábitos</div>
+        <div class="lcbd">
+          <div class="togrow"><span class="toglbl">Agua (2L+)</span><div class="tog" id="h0" onclick="this.classList.toggle('on');updH()"></div></div>
+          <div class="togrow"><span class="toglbl">Sin móvil primera hora</span><div class="tog" id="h1" onclick="this.classList.toggle('on');updH()"></div></div>
+          <div class="togrow"><span class="toglbl">Meditación</span><div class="tog" id="h2" onclick="this.classList.toggle('on');updH()"></div></div>
+          <div class="togrow"><span class="toglbl">Sin ultraprocesados</span><div class="tog" id="h3" onclick="this.classList.toggle('on');updH()"></div></div>
+          <div class="togrow"><span class="toglbl">Lectura</span><div class="tog" id="h4" onclick="this.classList.toggle('on');updH()"></div></div>
+          <div class="togrow"><span class="toglbl">Aire libre</span><div class="tog" id="h5" onclick="this.classList.toggle('on');updH()"></div></div>
+        </div>
+      </div>
+      <div class="fmb"><label class="flbl">Nota del día</label><textarea class="ifield" rows="3" placeholder="¿Algo que quieras recordar de hoy?..." id="lNote" style="resize:none;line-height:1.5" oninput="ld.note=this.value"></textarea></div>
+      <button class="savebtn" onclick="saveLog()">Guardar ✓</button>
+    </div>
+  </div>
+
+</div>
+<nav class="bnav">
+  <button class="nb active" id="nb-home" onclick="goPage('home')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Inicio
+  </button>
+  <button class="nb" id="nb-insights" onclick="goPage('insights')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Insights
+  </button>
+  <button class="nb" id="nb-coach" onclick="goPage('coach')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    Coach
+  </button>
+  <button class="nb" id="nb-log" onclick="goPage('log')">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Registro
+  </button>
+</nav>
+</div>
+
+<script>
+var U = null;
+var L = [];
+var EV = [];
+var TX = [];
+var chatH = [];
+var ld = {sleep:7,energy:6,exercise:false,spend:0,spendCat:'',productivity:6,focusHours:4,habits:[],note:''};
+var goal = '';
+var curSlide = 0;
+var gcalEvs = [];
+
+try { U = JSON.parse(localStorage.getItem('cv5_user') || 'null'); } catch(e) {}
+try { L = JSON.parse(localStorage.getItem('cv5_logs') || '[]'); } catch(e) {}
+try { EV = JSON.parse(localStorage.getItem('cv5_ev') || '[]'); } catch(e) {}
+try { TX = JSON.parse(localStorage.getItem('cv5_tx') || '[]'); } catch(e) {}
+
+if (U) {
+  document.getElementById('ob').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+}
+
+/* ── Onboarding ── */
+var BTN = ['Empezar →','Continuar →','Continuar →','Analizar mis datos 🧠','','¡Entrar a COACH →'];
+
+function handleBtn() {
+  if (curSlide === 0) { goSlide(1); return; }
+  if (curSlide === 1) {
+    var n = document.getElementById('nameInp').value.trim();
+    if (!n) { document.getElementById('nameInp').focus(); return; }
+    goSlide(2); return;
+  }
+  if (curSlide === 2) {
+    if (!goal) { document.querySelector('.prob').click(); }
+    goSlide(3); return;
+  }
+  if (curSlide === 3) { startLoading(); return; }
+  if (curSlide === 5) { finishOb(); return; }
+}
+
+function goSlide(n) {
+  document.getElementById('sl' + curSlide).classList.remove('active');
+  document.getElementById('sl' + curSlide).classList.add('out');
+  (function(old) {
+    setTimeout(function() { document.getElementById('sl' + old).classList.remove('out'); }, 380);
+  })(curSlide);
+  curSlide = n;
+  document.getElementById('sl' + n).classList.add('active');
+  var btn = document.getElementById('obBtn');
+  btn.textContent = BTN[n] || '→';
+  if (n >= 4) { document.getElementById('obDots').style.opacity = '0'; }
+  else {
+    document.getElementById('obDots').style.opacity = '1';
+    var dots = document.querySelectorAll('.ob-dot');
+    dots.forEach(function(d, i) { d.classList.toggle('on', i === n); });
+  }
+}
+
+function selProb(el, val) {
+  document.querySelectorAll('.prob').forEach(function(o) { o.classList.remove('sel'); });
+  el.classList.add('sel');
+  goal = val;
+}
+
+function connectGoogle() {
+  var key = prompt('Pega tu Google API Key:\n(console.cloud.google.com → APIs → Calendar API → Credenciales)', '');
+  if (!key) return;
+  var email = prompt('Tu email de Gmail:', '');
+  if (!email) return;
+  localStorage.setItem('cv5_gkey', key);
+  localStorage.setItem('cv5_gem', email);
+  fetchGCal(key, email).then(function(evs) {
+    gcalEvs = evs;
+    document.getElementById('gcalRow').style.display = 'none';
+    document.getElementById('gcalOk').style.display = 'flex';
+    document.getElementById('gcalN').textContent = evs.length + ' eventos';
+  }).catch(function() {
+    alert('Error conectando. Revisa que la clave es correcta y que Calendar API está habilitada.');
+  });
+}
+
+function connectBank() {
+  var id = prompt('Nordigen Secret ID:\n(bankaccountdata.gocardless.com → User Secrets)', '');
+  if (!id) return;
+  var key = prompt('Nordigen Secret Key:', '');
+  if (!key) return;
+  fetch('https://ob.nordigen.com/api/v2/token/new/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+    body: JSON.stringify({secret_id: id, secret_key: key})
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (!d.access) throw new Error('bad token');
+    localStorage.setItem('cv5_nt', d.access);
+    document.getElementById('bankRow').style.display = 'none';
+    document.getElementById('bankOk').style.display = 'flex';
+    document.getElementById('bankN').textContent = 'Token obtenido';
+  }).catch(function() {
+    alert('Error conectando banco. Verifica las credenciales en bankaccountdata.gocardless.com');
+  });
+}
+
+function skipAll() { goSlide(3); }
+
+function startLoading() {
+  goSlide(4);
+  document.getElementById('obBtn').style.display = 'none';
+  var steps = ['ls0','ls1','ls2','ls3','ls4'];
+  var i = 0;
+  function tick() {
+    if (i > 0) {
+      var prev = document.getElementById(steps[i-1]);
+      prev.className = 'lstep done';
+      prev.querySelector('.lsdot').textContent = '✓';
+    }
+    if (i < steps.length) {
+      document.getElementById(steps[i]).className = 'lstep go';
+      i++;
+      setTimeout(tick, 950);
+    } else {
+      setTimeout(showWow, 500);
+    }
+  }
+  setTimeout(tick, 400);
+}
+
+function showWow() {
+  goSlide(5);
+  var btn = document.getElementById('obBtn');
+  btn.style.display = 'block';
+  btn.textContent = '¡Entrar a COACH →';
+
+  var num = '', lbl = '', txt = '', items = [];
+
+  if (gcalEvs.length > 0) {
+    var meetings = gcalEvs.filter(function(e) { return e.attendees.length > 1; });
+    var totalH = gcalEvs.reduce(function(s, e) {
+      if (!e.start || e.allDay) return s;
+      return s + (new Date(e.end) - new Date(e.start)) / 3600000;
+    }, 0);
+    num = Math.round(totalH) + 'h';
+    lbl = 'comprometidas en reuniones los próximos 14 días';
+    txt = 'Tienes <em>' + gcalEvs.length + ' eventos</em> programados. <strong>' + meetings.length + ' son reuniones</strong> con otras personas — tiempo que no puedes recuperar.';
+    items = [{v: gcalEvs.length, l: 'Eventos totales'},{v: meetings.length, l: 'Con otras personas'},{v: Math.round(totalH) + 'h', l: 'Horas comprometidas'}];
+  } else if (goal === 'money') {
+    num = '340€'; lbl = 'gasto mensual promedio en restauración en España';
+    txt = 'El gasto en comida fuera es el <em>más difícil de ver</em> porque se hace en pequeñas cantidades. <strong>4€ aquí, 12€ allá.</strong> Al mes suman más de lo que crees.';
+    items = [{v:'340€',l:'Media nacional'},{v:'11€',l:'Por día laborable'},{v:'×4',l:'Más que en 2015'}];
+  } else if (goal === 'focus') {
+    num = '52min'; lbl = 'es el bloque de foco óptimo según investigaciones';
+    txt = 'Trabajar en bloques de <em>52 minutos</em> seguidos de 17 de descanso es el patrón de los trabajadores más productivos. <strong>No más, no menos.</strong>';
+    items = [{v:'52min',l:'Bloque óptimo'},{v:'17min',l:'Descanso ideal'},{v:'+40%',l:'Más producción'}];
+  } else if (goal === 'habits') {
+    num = '21'; lbl = 'días para formar un hábito nuevo';
+    txt = 'No son 21 días de esfuerzo. Son <em>21 días de hacer lo mismo en el mismo contexto.</em> <strong>El contexto importa más que la motivación.</strong>';
+    items = [{v:'21d',l:'Para automatizar'},{v:'66d',l:'Para que sea permanente'},{v:'×1',l:'Un hábito a la vez'}];
+  } else {
+    num = '7h'; lbl = 'es el umbral que cambia todo';
+    txt = 'Por debajo de <em>7 horas</em> de sueño tu energía cae un 20% y tus decisiones empeoran. <strong>La mayoría de personas no llega a 7h.</strong>';
+    items = [{v:'7h',l:'Mínimo recomendado'},{v:'-20%',l:'Caída de rendimiento'},{v:'×2',l:'Peores decisiones'}];
+  }
+
+  document.getElementById('wowN').textContent = num;
+  document.getElementById('wowL').textContent = lbl;
+  document.getElementById('wowT').innerHTML = txt;
+  document.getElementById('wowI').innerHTML = items.map(function(b) {
+    return '<div class="wow-item"><span>' + b.l + '</span><span class="wow-item-v">' + b.v + '</span></div>';
+  }).join('');
+}
+
+function finishOb() {
+  var name = document.getElementById('nameInp').value.trim() || 'Tú';
+  U = {
+    name: name,
+    goal: goal,
+    gkey: localStorage.getItem('cv5_gkey') || '',
+    gem: localStorage.getItem('cv5_gem') || '',
+    nt: localStorage.getItem('cv5_nt') || '',
+    apiKey: '',
+    created: new Date().toISOString()
+  };
+  localStorage.setItem('cv5_user', JSON.stringify(U));
+  if (gcalEvs.length) { EV = gcalEvs; localStorage.setItem('cv5_ev', JSON.stringify(EV)); }
+  if (!L.length) {
+    L.push({date: new Date().toDateString(), sleep:7, energy:6, exercise:false, spend:0, productivity:6, focusHours:4, habits:[], note:''});
+    localStorage.setItem('cv5_logs', JSON.stringify(L));
+  }
+  document.getElementById('ob').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  initApp();
+  if (U.nt) syncBank();
+}
+
+/* ── App ── */
+function initApp() {
+  if (!U) return;
+  document.getElementById('userAv').textContent = U.name[0].toUpperCase();
+  renderIntRow();
+  renderHome();
+  renderStreak();
+  initChat();
+}
+
+function renderIntRow() {
+  document.getElementById('intRow').innerHTML = [
+    {l:'Google Calendar', on: !!U.gkey},
+    {l:'Banco', on: !!U.nt},
+    {l:'Apple Health', on: false}
+  ].map(function(c) {
+    return '<div class="intchip ' + (c.on ? 'on' : 'off') + '"><div class="idot"></div>' + c.l + '</div>';
+  }).join('');
+}
+
+/* ── Nav ── */
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nb').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('pg-' + name).classList.add('active');
+  var nb = document.getElementById('nb-' + name);
+  if (nb) nb.classList.add('active');
+  if (name === 'coach') scrollChat();
+  if (name === 'insights') renderInsights();
+}
+
+/* ── Sync ── */
+function syncAll() {
+  var btn = document.getElementById('syncBtn');
+  btn.classList.add('spinning');
+  Promise.all([syncCalendar(), syncBank()]).then(function() {
+    renderHome();
+    renderIntRow();
+    btn.classList.remove('spinning');
+  });
+}
+
+function syncCalendar() {
+  if (!U || !U.gkey) return Promise.resolve();
+  return fetchGCal(U.gkey, U.gem).then(function(evs) {
+    EV = evs;
+    localStorage.setItem('cv5_ev', JSON.stringify(EV));
+  }).catch(function(e) { console.warn('Cal:', e); });
+}
+
+function fetchGCal(key, email) {
+  var now = new Date().toISOString();
+  var end = new Date(Date.now() + 14 * 86400000).toISOString();
+  var url = 'https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(email) + '/events?key=' + key + '&timeMin=' + now + '&timeMax=' + end + '&singleEvents=true&orderBy=startTime&maxResults=30';
+  return fetch(url).then(function(r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(function(d) {
+    return (d.items || []).map(function(e) {
+      return {
+        id: e.id,
+        title: e.summary || 'Sin título',
+        start: (e.start && (e.start.dateTime || e.start.date)) || '',
+        end: (e.end && (e.end.dateTime || e.end.date)) || '',
+        location: e.location || '',
+        attendees: (e.attendees || []).map(function(a) { return a.email; }).filter(Boolean),
+        allDay: !e.start || !e.start.dateTime
+      };
+    });
+  });
+}
+
+function syncBank() {
+  if (!U || !U.nt) return Promise.resolve();
+  return fetch('https://ob.nordigen.com/api/v2/accounts/', {
+    headers: {'Authorization': 'Bearer ' + U.nt, 'Accept': 'application/json'}
+  }).then(function(r) {
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }).then(function(ad) {
+    var accs = (ad.results || []).slice(0, 3);
+    var all = [];
+    var promises = accs.map(function(acc) {
+      return fetch('https://ob.nordigen.com/api/v2/accounts/' + acc.id + '/transactions/', {
+        headers: {'Authorization': 'Bearer ' + U.nt, 'Accept': 'application/json'}
+      }).then(function(r) { return r.json(); }).then(function(td) {
+        var booked = (td.transactions && td.transactions.booked) || [];
+        booked.slice(0, 40).forEach(function(t) {
+          all.push({
+            id: t.transactionId || Math.random().toString(36).slice(2),
+            date: t.bookingDate || new Date().toISOString().slice(0, 10),
+            amount: parseFloat((t.transactionAmount && t.transactionAmount.amount) || 0),
+            currency: (t.transactionAmount && t.transactionAmount.currency) || 'EUR',
+            desc: t.creditorName || t.remittanceInformationUnstructured || 'Desconocido',
+            cat: catTx(t.creditorName || '')
+          });
+        });
+      }).catch(function() {});
+    });
+    return Promise.all(promises).then(function() {
+      all.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+      TX = all;
+      localStorage.setItem('cv5_tx', JSON.stringify(TX));
+      var td = new Date().toISOString().slice(0, 10);
+      var todayNeg = TX.filter(function(t) { return t.date === td && t.amount < 0; });
+      if (todayNeg.length) {
+        var total = todayNeg.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+        ld.spend = Math.round(total * 100) / 100;
+        var el = document.getElementById('lSpend');
+        if (el) el.value = ld.spend;
+        document.getElementById('bankAuto').style.display = 'block';
+        document.getElementById('bankAutoTxt').textContent = todayNeg.length + ' transacciones · Total: ' + total.toFixed(2) + '€';
+      }
+    });
+  }).catch(function(e) { console.warn('Bank:', e); });
+}
+
+function catTx(n) {
+  n = (n || '').toLowerCase();
+  if (/mercadona|carrefour|lidl|aldi|supermercado/.test(n)) return '🛒 Supermercado';
+  if (/mcdonald|burger|glovo|just.eat|restaurante|cafe|bar/.test(n)) return '🍔 Restauración';
+  if (/amazon|zara|mango|primark|fnac/.test(n)) return '🛍️ Compras';
+  if (/renfe|metro|bus|uber|taxi|repsol|bp/.test(n)) return '🚗 Transporte';
+  if (/netflix|spotify|hbo|disney/.test(n)) return '🎮 Ocio';
+  if (/farmacia|clinica/.test(n)) return '💊 Salud';
+  if (/vodafone|movistar|orange|endesa/.test(n)) return '🏠 Hogar';
+  return '📦 Otros';
+}
+
+/* ── Scores ── */
+function calcScores(log) {
+  var td = new Date().toISOString().slice(0, 10);
+  var negToday = TX.filter(function(t) { return t.date === td && t.amount < 0; });
+  var todaySpend = negToday.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0) || log.spend || 0;
+  var negAll = TX.filter(function(t) { return t.amount < 0; }).slice(0, 30);
+  var avgSpend = negAll.length ? negAll.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0) / negAll.length : 50;
+  return {
+    sleep: Math.min(100, Math.round(((log.sleep || 7) / 9) * 100)),
+    money: Math.max(0, Math.min(100, Math.round(100 - (todaySpend / (avgSpend * 2 || 100)) * 80))),
+    time:  Math.min(100, Math.round(((log.productivity || 6) / 10) * 100)),
+    habits: log.habits ? Math.round((log.habits.filter(Boolean).length / 6) * 100) : 50
+  };
+}
+
+function setRing(id, score, circ) {
+  var el = document.getElementById(id);
+  if (el) el.style.strokeDashoffset = circ - (score / 100) * circ;
+}
+
+/* ── Home ── */
+function renderHome() {
+  var today = L.length ? L[L.length - 1] : {};
+  var s = calcScores(today);
+  var g = Math.round((s.sleep + s.money + s.time + s.habits) / 4);
+
+  document.getElementById('gsc').textContent = g;
+  document.getElementById('rsSl').textContent = s.sleep;
+  document.getElementById('rsMo').textContent = s.money;
+  document.getElementById('rsTi').textContent = s.time;
+  document.getElementById('rsHa').textContent = s.habits;
+
+  setTimeout(function() {
+    setRing('rS', s.sleep, 434);
+    setRing('rM', s.money, 346);
+    setRing('rT', s.time, 258);
+    setRing('rH', s.habits, 170);
+  }, 100);
+
+  renderNarrative(today, s, g);
+  renderAlerts(today, s);
+  renderTodayEv();
+  renderTodayTx();
+  renderFocus(s);
+}
+
+function renderNarrative(log, s, g) {
+  var now = new Date();
+  var h = now.getHours();
+  var greeting = h < 12 ? 'Buenos días' : (h < 20 ? 'Buenas tardes' : 'Buenas noches');
+  var n = (U && U.name) ? U.name : '';
+
+  document.getElementById('narrDate').textContent = now.toLocaleDateString('es-ES', {weekday:'long',day:'numeric',month:'long'});
+
+  var td = now.toISOString().slice(0, 10);
+  var todayTX = TX.filter(function(t) { return t.date === td && t.amount < 0; });
+  var todaySpend = todayTX.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+  var nextEv = EV.find(function(e) { return new Date(e.start) > now; });
+  var weak = Object.entries(s).sort(function(a, b) { return a[1] - b[1]; })[0];
+  var weakNames = {sleep:'el sueño',money:'los gastos',time:'la productividad',habits:'los hábitos'};
+
+  var story = '';
+
+  if (L.length < 3) {
+    story = greeting + ', <em>' + n + '</em>. Soy tu coach. Estoy aprendiendo cómo eres.' + (TX.length ? ' Ya tengo ' + TX.length + ' transacciones del banco.' : '') + ' Cuantos más días registres, más precisas serán mis observaciones.';
+  } else if (TX.length > 5 && todaySpend > 0) {
+    var cats = {};
+    todayTX.forEach(function(t) { cats[t.cat] = (cats[t.cat] || 0) + Math.abs(t.amount); });
+    var topCat = Object.entries(cats).sort(function(a, b) { return b[1] - a[1]; })[0];
+    story = 'Hoy llevas <em>' + todaySpend.toFixed(0) + '€</em> en ' + todayTX.length + ' transacciones.' + (topCat ? ' Lo más: <strong>' + topCat[0] + ' (' + topCat[1].toFixed(0) + '€)</strong>.' : '') + (nextEv ? ' Tienes <em>' + nextEv.title + '</em> pronto.' : '');
+  } else if (nextEv) {
+    var inH = Math.round((new Date(nextEv.start) - now) / 3600000);
+    story = (inH < 2 ? 'En menos de ' + inH + 'h tienes' : 'Próximamente tienes') + ' <em>' + nextEv.title + '</em>' + (nextEv.attendees.length ? ' con ' + nextEv.attendees.length + ' personas' : '') + '.' + (weak[1] < 60 ? ' Además, ' + weakNames[weak[0]] + ' necesita atención (<strong>' + weak[1] + '/100</strong>).' : '');
+  } else if (L.length >= 7) {
+    var avgSl = (L.slice(-7).reduce(function(a, l) { return a + (l.sleep || 7); }, 0) / 7).toFixed(1);
+    var avgPr = (L.slice(-7).reduce(function(a, l) { return a + (l.productivity || 6); }, 0) / 7).toFixed(1);
+    story = 'Esta semana has dormido una media de <em>' + avgSl + 'h</em> y tu productividad media ha sido <em>' + avgPr + '/10</em>. Tu punto más débil: <strong>' + weakNames[weak[0]] + ' (' + weak[1] + '/100)</strong>.';
+  } else {
+    story = greeting + ', <em>' + n + '</em>. Puntuación global: <em>' + g + '/100</em>. Tu punto más débil es <strong>' + weakNames[weak[0]] + '</strong>. Sigue registrando para que pueda ver patrones claros.';
+  }
+
+  document.getElementById('narrTxt').innerHTML = story;
+}
+
+function renderAlerts(log, s) {
+  var alerts = [];
+  var td = new Date().toISOString().slice(0, 10);
+
+  if (TX.length >= 10) {
+    var week = TX.filter(function(t) { return t.amount < 0 && new Date(t.date) > new Date(Date.now() - 7 * 86400000); });
+    var ws = week.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+    var cats = {};
+    week.forEach(function(t) { cats[t.cat] = (cats[t.cat] || 0) + Math.abs(t.amount); });
+    var top = Object.entries(cats).sort(function(a, b) { return b[1] - a[1]; })[0];
+    if (top) alerts.push({type:'tip',ico:'📊',t:'Esta semana: ' + ws.toFixed(0) + '€ gastados',p:'Mayor categoría: ' + top[0] + ' con ' + top[1].toFixed(0) + '€ — el ' + Math.round(top[1] / ws * 100) + '% del total.'});
+  }
+
+  if (EV.length > 0) {
+    var now = new Date();
+    var soon = EV.find(function(e) { return new Date(e.start) - now < 7200000 && new Date(e.start) > now; });
+    if (soon) alerts.push({type:'warn',ico:'⏰',t:'En breve: ' + soon.title,p:soon.location ? '📍 ' + soon.location : 'Tienes este evento muy pronto.'});
+  }
+
+  if (L.length >= 5) {
+    var lowSl = L.slice(-5).filter(function(x) { return (x.sleep || 7) < 6.5; });
+    if (lowSl.length >= 3) alerts.push({type:'bad',ico:'😴',t:'Déficit de sueño acumulado',p:lowSl.length + ' de los últimos 5 días has dormido menos de 6.5h. Esto afecta tus decisiones y tu energía.'});
+  }
+
+  if (L.length >= 7 && TX.length >= 10) {
+    var pairs = L.slice(-14).map(function(x) {
+      var day = new Date(x.date || Date.now()).toISOString().slice(0, 10);
+      var sp = TX.filter(function(t) { return t.date === day && t.amount < 0; }).reduce(function(s, t) { return s + Math.abs(t.amount); }, 0) || x.spend || 0;
+      return {sleep: x.sleep || 7, spend: sp};
+    }).filter(function(x) { return x.spend > 0; });
+    if (pairs.length >= 5) {
+      var ls = pairs.filter(function(x) { return x.sleep < 6.5; });
+      var hs = pairs.filter(function(x) { return x.sleep >= 7; });
+      if (ls.length >= 2 && hs.length >= 2) {
+        var la = ls.reduce(function(s, x) { return s + x.spend; }, 0) / ls.length;
+        var ha = hs.reduce(function(s, x) { return s + x.spend; }, 0) / hs.length;
+        if (la > ha * 1.15) alerts.push({type:'tip',ico:'🔗',t:'Patrón detectado: sueño + dinero',p:'Cuando duermes menos de 6.5h gastas ' + (la - ha).toFixed(0) + '€ más de media. Dato real de tus transacciones.'});
+      }
+    }
+  }
+
+  if (!alerts.length) alerts.push({type:'',ico:'📡',t:TX.length ? 'Datos en tiempo real activos' : 'Conecta tus datos',p:TX.length ? TX.length + ' transacciones · ' + EV.length + ' eventos sincronizados.' : 'Conecta tu banco y Google Calendar para análisis automático.'});
+
+  document.getElementById('alertsDiv').innerHTML = alerts.map(function(a) {
+    return '<div class="alrt ' + a.type + '"><div class="alrt-ico">' + a.ico + '</div><div><div class="alrt-t">' + a.t + '</div><div class="alrt-p">' + a.p + '</div></div></div>';
+  }).join('');
+}
+
+function renderTodayEv() {
+  var now = new Date();
+  var today = now.toDateString();
+  var tomorrow = new Date(Date.now() + 86400000).toDateString();
+  var evs = EV.filter(function(e) {
+    var ds = new Date(e.start).toDateString();
+    return ds === today || ds === tomorrow;
+  }).slice(0, 3);
+  document.getElementById('evSec').style.display = EV.length ? 'block' : 'none';
+  document.getElementById('evDiv').innerHTML = evs.length ? evs.map(function(ev) {
+    var ds = new Date(ev.start).toDateString();
+    var label = ds === today ? 'Hoy' : 'Mañana';
+    var timeStr = ev.allDay ? '—' : new Date(ev.start).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+    return '<div class="evrow"><div class="evtime"><div class="evt">' + timeStr + '</div><div class="evd">' + label + '</div></div><div class="evdiv"></div><div style="flex:1;min-width:0"><div class="evtit">' + ev.title + '</div>' + (ev.location ? '<div class="evmeta">📍 ' + ev.location.slice(0, 35) + '</div>' : '') + (ev.attendees.length ? '<div class="evmeta">👥 ' + ev.attendees.length + ' personas</div>' : '') + '</div></div>';
+  }).join('') : '<div class="empty">Sin eventos hoy ni mañana</div>';
+}
+
+function renderTodayTx() {
+  document.getElementById('txSec').style.display = TX.length ? 'block' : 'none';
+  document.getElementById('txDiv').innerHTML = TX.slice(0, 4).map(function(tx) {
+    var cls = tx.amount < 0 ? 'neg' : 'pos';
+    var prefix = tx.amount < 0 ? '-' : '+';
+    return '<div class="txrow"><div class="txico">' + (tx.cat ? tx.cat.split(' ')[0] : '💳') + '</div><div style="flex:1;min-width:0"><div class="txname">' + tx.desc + '</div><div class="txcat">' + tx.cat + '</div></div><div class="txamt ' + cls + '">' + prefix + '&nbsp;' + Math.abs(tx.amount).toFixed(2) + '€</div></div>';
+  }).join('');
+}
+
+function renderFocus(s) {
+  var wTX = TX.filter(function(t) { return t.amount < 0 && new Date(t.date) > new Date(Date.now() - 7 * 86400000); });
+  var ws = wTX.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+  var tasks = [
+    {t:'Dormir 7h+ esta noche', w:'Tu sueño afecta tus gastos, tu energía y tus decisiones más que cualquier otro factor.'},
+    {t:'Revisar gastos de esta semana', w: TX.length ? 'Llevas ' + ws.toFixed(0) + '€ esta semana en ' + wTX.length + ' transacciones.' : 'Pequeños gastos suman más de lo que crees.'},
+    {t:'Un bloque de 2h sin móvil', w:'Tu cerebro necesita bloques de foco sin interrupciones para rendir al máximo.'}
+  ];
+  document.getElementById('focDiv').innerHTML = tasks.map(function(x, i) {
+    return '<div class="foc"><div class="fn">0' + (i+1) + '</div><div style="flex:1"><div class="ft">' + x.t + '</div><div class="fw">' + x.w + '</div></div><div class="fchk" onclick="this.classList.toggle(\'done\');this.textContent=this.classList.contains(\'done\')?\'✓\':\'\'"></div></div>';
+  }).join('');
+}
+
+function renderStreak() {
+  var days = ['L','M','X','J','V','S','D'];
+  var td = new Date().getDay();
+  var adj = td === 0 ? 6 : td - 1;
+  document.getElementById('strkDiv').innerHTML = days.map(function(d, i) {
+    var isT = i === adj;
+    var isDone = i < adj && L.length > adj - i;
+    var cls = isT ? 'today' : (isDone ? 'done' : '');
+    return '<div class="sday"><div class="scir ' + cls + '">' + (isDone ? '✓' : d) + '</div><div class="sdlbl">' + d + '</div></div>';
+  }).join('');
+}
+
+/* ── Insights ── */
+function renderInsights() {
+  renderCorr();
+  renderAllEv();
+  renderAllTx();
+}
+
+function renderCorr() {
+  var corrs = [];
+
+  if (L.length >= 7 && TX.length >= 10) {
+    var pairs = L.slice(-21).map(function(x) {
+      var day = new Date(x.date || Date.now()).toISOString().slice(0, 10);
+      var sp = TX.filter(function(t) { return t.date === day && t.amount < 0; }).reduce(function(s, t) { return s + Math.abs(t.amount); }, 0) || x.spend || 0;
+      return {sleep: x.sleep || 7, spend: sp, prod: x.productivity || 6, ex: x.exercise};
+    }).filter(function(x) { return x.spend > 0; });
+
+    if (pairs.length >= 5) {
+      var ls = pairs.filter(function(x) { return x.sleep < 6.5; });
+      var hs = pairs.filter(function(x) { return x.sleep >= 7; });
+      if (ls.length >= 2 && hs.length >= 2) {
+        var la = ls.reduce(function(s, x) { return s + x.spend; }, 0) / ls.length;
+        var ha = hs.reduce(function(s, x) { return s + x.spend; }, 0) / hs.length;
+        if (la > ha * 1.1) corrs.push({e:'😴💸',t:'Duermes menos → gastas más',b:'78%',p:'Cuando duermes menos de 6.5h gastas de media <em>' + (la-ha).toFixed(0) + '€ más</em>. El cansancio reduce tu autocontrol financiero.',data:[{v:la.toFixed(0)+'€',l:'Con poco sueño'},{v:ha.toFixed(0)+'€',l:'Con buen sueño'}]});
+      }
+    }
+
+    var wEx = pairs.filter(function(x) { return x.ex; });
+    var noEx = pairs.filter(function(x) { return !x.ex; });
+    if (wEx.length >= 2 && noEx.length >= 2) {
+      var aw = wEx.reduce(function(s, x) { return s + x.prod; }, 0) / wEx.length;
+      var an = noEx.reduce(function(s, x) { return s + x.prod; }, 0) / noEx.length;
+      if (aw > an) corrs.push({e:'🏃⚡',t:'Ejercicio → productividad',b:Math.round((aw-an)/an*100)+'%',p:'Los días que haces ejercicio tu productividad sube <em>un ' + ((aw-an)/an*100).toFixed(0) + '%</em>. No es opinión, son tus datos.',data:[{v:aw.toFixed(1),l:'Con ejercicio'},{v:an.toFixed(1),l:'Sin ejercicio'}]});
+    }
+  }
+
+  if (!corrs.length) corrs.push({e:'🔍',t:'Analizando patrones',b:'—',p:'Necesito al menos <em>7 días</em> de datos y transacciones reales para detectar correlaciones fiables. Sigue registrando.',data:[]});
+
+  document.getElementById('corrDiv').innerHTML = corrs.map(function(c) {
+    return '<div class="corr"><div class="corr-h"><span class="corr-e">' + c.e + '</span><span class="corr-t">' + c.t + '</span><span class="corr-b">' + c.b + '</span></div><div class="corr-p">' + c.p + '</div>' + (c.data.length ? '<div class="corr-data">' + c.data.map(function(d) { return '<div class="cdi"><div class="cdv">' + d.v + '</div><div class="cdl">' + d.l + '</div></div>'; }).join('') + '</div>' : '') + '</div>';
+  }).join('');
+}
+
+function renderAllEv() {
+  document.getElementById('allEvDiv').innerHTML = EV.length ? EV.slice(0, 20).map(function(ev) {
+    var timeStr = ev.allDay ? 'Todo' : new Date(ev.start).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'});
+    var dateStr = new Date(ev.start).toLocaleDateString('es-ES', {day:'numeric',month:'short'});
+    return '<div class="evrow"><div class="evtime"><div class="evt">' + timeStr + '</div><div class="evd">' + dateStr + '</div></div><div class="evdiv"></div><div style="flex:1;min-width:0"><div class="evtit">' + ev.title + '</div>' + (ev.location ? '<div class="evmeta">📍 ' + ev.location.slice(0, 35) + '</div>' : '') + (ev.attendees.length ? '<div class="evmeta">👥 ' + ev.attendees.length + '</div>' : '') + '</div></div>';
+  }).join('') : '<div class="empty">' + (U && U.gkey ? 'Sin eventos próximos' : 'Conecta Google Calendar') + '</div>';
+}
+
+function renderAllTx() {
+  if (!TX.length) { document.getElementById('allTxDiv').innerHTML = '<div class="empty">' + (U && U.nt ? 'Sincronizando...' : 'Conecta tu banco para ver transacciones') + '</div>'; return; }
+  var byDate = {};
+  TX.slice(0, 60).forEach(function(t) { byDate[t.date] = (byDate[t.date] || []).concat(t); });
+  document.getElementById('allTxDiv').innerHTML = Object.entries(byDate).slice(0, 12).map(function(entry) {
+    var date = entry[0]; var txs = entry[1];
+    var dayTotal = txs.filter(function(t) { return t.amount < 0; }).reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+    return '<div style="font-family:DM Mono,monospace;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--mu);padding:0 2px;margin:10px 0 6px">' + date + ' · ' + dayTotal.toFixed(0) + '€</div>' +
+      txs.map(function(tx) {
+        var cls = tx.amount < 0 ? 'neg' : 'pos';
+        var prefix = tx.amount < 0 ? '-' : '+';
+        return '<div class="txrow"><div class="txico">' + (tx.cat ? tx.cat.split(' ')[0] : '💳') + '</div><div style="flex:1;min-width:0"><div class="txname">' + tx.desc + '</div><div class="txcat">' + tx.cat + '</div></div><div class="txamt ' + cls + '">' + prefix + '&nbsp;' + Math.abs(tx.amount).toFixed(2) + '€</div></div>';
+      }).join('');
+  }).join('');
+}
+
+/* ── Chat ── */
+var SUGG = ['¿Cuánto gasto a la semana?','¿Cuándo soy más productivo?','¿Qué reunión me costará energía?','Dame un análisis completo','¿Qué cambio tendría más impacto?'];
+
+function initChat() {
+  document.getElementById('chatSugg').innerHTML = SUGG.map(function(s) {
+    return '<div class="sg" onclick="sendSug(\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</div>';
+  }).join('');
+  if (!chatH.length) addMsg('c', 'Hola ' + (U ? U.name : '') + '. Tengo acceso a ' + (TX.length ? TX.length + ' transacciones reales, ' : '') + (EV.length ? EV.length + ' eventos del calendario y ' : '') + 'tus registros diarios. Pregúntame lo que quieras.');
+}
+
+function sendSug(t) { document.getElementById('chatInp').value = t; sendChat(); }
+
+function sendChat() {
+  var inp = document.getElementById('chatInp');
+  var t = inp.value.trim();
+  if (!t) return;
+  inp.value = '';
+  addMsg('u', t);
+  chatH.push({role:'user', content:t});
+  var tid = addTyping();
+  getResp(t).then(function(r) {
+    removeTyping(tid);
+    addMsg('c', r);
+    chatH.push({role:'assistant', content:r});
+    scrollChat();
+  });
+}
+
+function getResp(q) {
+  var tl = L.length ? L[L.length - 1] : {};
+  var s = calcScores(tl);
+  var td = new Date().toISOString().slice(0, 10);
+  var wTX = TX.filter(function(t) { return t.amount < 0 && new Date(t.date) > new Date(Date.now() - 7 * 86400000); });
+  var wS = wTX.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+  var cats = {};
+  wTX.forEach(function(t) { cats[t.cat] = (cats[t.cat] || 0) + Math.abs(t.amount); });
+  var topCats = Object.entries(cats).slice(0, 3).map(function(e) { return e[0] + ':' + e[1].toFixed(0) + '€'; }).join(', ');
+  var nextEv = EV.find(function(e) { return new Date(e.start) > new Date(); });
+  var avgSleep = L.length ? (L.reduce(function(a, l) { return a + (l.sleep || 7); }, 0) / L.length).toFixed(1) : 7;
+  var avgProd = L.length ? (L.reduce(function(a, l) { return a + (l.productivity || 6); }, 0) / L.length).toFixed(1) : 6;
+
+  var ctx = 'Eres COACH, coach personal con IA. Directo, honesto, empático. Solo datos reales.\n\nUSUARIO: ' + (U ? U.name : '') + '\nDIAS: ' + L.length + '\nSUEÑO MEDIO: ' + avgSleep + 'h\nPROD MEDIA: ' + avgProd + '/10\nSCORES: Sueño ' + s.sleep + ' Finanzas ' + s.money + ' Tiempo ' + s.time + ' Hábitos ' + s.habits + '\nGASTO SEMANA: ' + wS.toFixed(0) + '€ (' + wTX.length + ' tx)\nCATEGORIAS: ' + (topCats || 'sin datos') + '\nTX TOTALES: ' + TX.length + '\nPROXIMO EVENTO: ' + (nextEv ? nextEv.title + ' (' + new Date(nextEv.start).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'}) + ')' : 'ninguno') + '\n\nResponde en español, personal y directo. Máximo 120 palabras. Sin bullets.';
+
+  if (U && U.apiKey) {
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({model:'claude-sonnet-4-6', max_tokens:300, system:ctx, messages: chatH.slice(-6).concat([{role:'user', content:q}])})
+    }).then(function(r) { return r.json(); }).then(function(d) {
+      return (d.content && d.content[0] && d.content[0].text) || fallback(q);
+    }).catch(function() { return fallback(q); });
+  }
+  return Promise.resolve(fallback(q));
+}
+
+function fallback(q) {
+  var n = U ? U.name : '';
+  var ql = q.toLowerCase();
+  var wTX = TX.filter(function(t) { return t.amount < 0 && new Date(t.date) > new Date(Date.now() - 7 * 86400000); });
+  var wS = wTX.reduce(function(s, t) { return s + Math.abs(t.amount); }, 0);
+
+  if ((ql.indexOf('gast') >= 0 || ql.indexOf('diner') >= 0) && TX.length) {
+    var cats = {};
+    wTX.forEach(function(t) { cats[t.cat] = (cats[t.cat] || 0) + Math.abs(t.amount); });
+    var top = Object.entries(cats).sort(function(a, b) { return b[1] - a[1]; })[0];
+    return n + ', esta semana llevas ' + wS.toFixed(0) + '€ en ' + wTX.length + ' transacciones.' + (top ? ' Mayor categoría: ' + top[0] + ' con ' + top[1].toFixed(0) + '€ (' + Math.round(top[1]/wS*100) + '% del total).' : '');
+  }
+  if (ql.indexOf('reunión') >= 0 || ql.indexOf('evento') >= 0 || ql.indexOf('agenda') >= 0) {
+    var next = EV.find(function(e) { return new Date(e.start) > new Date(); });
+    return next ? 'Tu próximo evento es "' + next.title + '" el ' + new Date(next.start).toLocaleDateString('es-ES', {weekday:'long'}) + ' a las ' + new Date(next.start).toLocaleTimeString('es-ES', {hour:'2-digit',minute:'2-digit'}) + '. Tienes ' + EV.length + ' eventos esta semana.' : 'No veo eventos próximos en tu calendario.';
+  }
+  if (ql.indexOf('análisis') >= 0 || ql.indexOf('resumen') >= 0) {
+    var s = calcScores(L.length ? L[L.length-1] : {});
+    return n + ': global ' + Math.round((s.sleep+s.money+s.time+s.habits)/4) + '/100. ' + (TX.length ? 'Banco: ' + TX.length + ' transacciones, ' + wS.toFixed(0) + '€ esta semana. ' : '') + (EV.length ? 'Calendar: ' + EV.length + ' eventos. ' : '') + (L.length < 7 ? 'Necesito ' + Math.max(0, 7-L.length) + ' días más para correlaciones precisas.' : 'Hay patrones claros entre tu sueño y tus gastos.');
+  }
+  if (ql.indexOf('sueño') >= 0 || ql.indexOf('dormir') >= 0) {
+    var avg = L.length ? (L.reduce(function(a, l) { return a + (l.sleep||7); }, 0) / L.length).toFixed(1) : 7;
+    return n + ', tu media de sueño es ' + avg + 'h. ' + (TX.length >= 10 ? 'Según tus datos bancarios, cuando duermes menos de 7h gastas más.' : '') + ' Cada 30 min menos de sueño tiene un coste real.';
+  }
+  if (ql.indexOf('cambi') >= 0 || ql.indexOf('impacto') >= 0 || ql.indexOf('mejor') >= 0) {
+    return 'Una sola cosa esta semana, ' + n + ': duerme 7h mínimo. Impacta tu energía, tus decisiones de gasto y tu productividad — todo a la vez.';
+  }
+  return (TX.length ? 'Tengo ' + TX.length + ' transacciones reales. ' : '') + (EV.length ? 'Y ' + EV.length + ' eventos del calendario. ' : '') + 'Pregúntame algo concreto y te respondo con datos, no con consejos genéricos.';
+}
+
+var tc = 0;
+function addTyping() {
+  var id = 'typ' + (++tc);
+  var el = document.createElement('div');
+  el.className = 'cmsg c';
+  el.id = id;
+  el.innerHTML = '<div class="cav">🧠</div><div class="cbub"><div class="typ"><div class="td"></div><div class="td"></div><div class="td"></div></div></div>';
+  document.getElementById('chatMsgs').appendChild(el);
+  scrollChat();
+  return id;
+}
+function removeTyping(id) { var el = document.getElementById(id); if (el) el.remove(); }
+function addMsg(role, text) {
+  var el = document.createElement('div');
+  el.className = 'cmsg ' + role;
+  var av = role === 'c' ? '🧠' : (U ? U.name[0] : '?');
+  el.innerHTML = '<div class="cav">' + av + '</div><div class="cbub">' + text + '</div>';
+  document.getElementById('chatMsgs').appendChild(el);
+  scrollChat();
+}
+function scrollChat() { var c = document.getElementById('chatMsgs'); setTimeout(function() { c.scrollTop = c.scrollHeight; }, 50); }
+
+/* ── Log ── */
+function selCat(el, cat) { document.querySelectorAll('.cat').forEach(function(c) { c.classList.remove('on'); }); el.classList.add('on'); ld.spendCat = cat; }
+function updH() { ld.habits = [0,1,2,3,4,5].map(function(i) { var el = document.getElementById('h'+i); return el ? el.classList.contains('on') : false; }); }
+function saveLog() {
+  var e = Object.assign({date: new Date().toDateString(), savedAt: new Date().toISOString()}, ld);
+  var idx = L.findIndex(function(x) { return x.date === e.date; });
+  if (idx >= 0) L[idx] = e; else L.push(e);
+  localStorage.setItem('cv5_logs', JSON.stringify(L));
+  var btn = document.querySelector('.savebtn');
+  btn.textContent = '✓ Guardado';
+  btn.style.background = 'var(--gr)';
+  setTimeout(function() { btn.textContent = 'Guardar ✓'; btn.style.background = 'var(--ac)'; }, 2000);
+  renderHome();
+  renderStreak();
+  setTimeout(function() { goPage('home'); }, 700);
+}
+</script>
+
+</body>
+</html>
